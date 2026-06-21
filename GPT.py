@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 
-device = (
+"""device = (
     'cuda'
     if torch.cuda.is_available()
     else 'mps'
@@ -10,7 +10,7 @@ device = (
     else 'cpu'
 )
 
-print(device)
+print(device)"""
 
 # hyperparameters
 batch_size = 64 # how many independent sequences will we process in parallel?
@@ -24,6 +24,7 @@ n_embd = 384
 n_head = 6
 n_layer = 6
 dropout = 0.2
+
 # ------------
 
 torch.manual_seed(1337)
