@@ -14,16 +14,16 @@ print(device)"""
 
 # hyperparameters
 batch_size = 64 # how many independent sequences will we process in parallel?
-block_size = 256 # what is the maximum context length for predictions?
+block_size = 128 # what is the maximum context length for predictions?
 max_iters = 5000
 eval_interval = 500
 learning_rate = 3e-4
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 eval_iters = 200
-n_embd = 384
+n_embd = 192
 n_head = 6
-n_layer = 6
-dropout = 0.2
+n_layer = 4
+dropout = 0.2  # 데이터가 적어 과적합 방지용으로 유지
 
 # ------------
 
@@ -220,7 +220,10 @@ for iter in range(max_iters):
     # every once in a while evaluate the loss on train and val sets
     if iter % eval_interval == 0 or iter == max_iters - 1:
         losses = estimate_loss()
-        print(f"step {iter}: train loss {losses['train']:.4f}, val loss {losses['val']:.4f}")
+        line = f"step {iter}: train loss {losses['train']:.4f}, val loss {losses['val']:.4f}"
+        print(line)
+        with open('loss_log.txt', 'a', encoding='utf-8') as logf:
+            logf.write(line + "\n")
 
     # sample a batch of data
     xb, yb = get_batch('train')
@@ -233,5 +236,13 @@ for iter in range(max_iters):
 
 # generate from the model
 context = torch.zeros((1, 1), dtype=torch.long, device=device)
-print(decode(m.generate(context, max_new_tokens=500)[0].tolist()))
-#open('more.txt', 'w').write(decode(m.generate(context, max_new_tokens=10000)[0].tolist()))
+generated = decode(m.generate(context, max_new_tokens=5000)[0].tolist())
+print(generated)
+
+# 학습 결과물 저장 (제출용)
+with open('output_lyrics.txt', 'w', encoding='utf-8') as f:
+    f.write(generated)
+
+# 학습된 모델 가중치 저장 (선택)
+torch.save(model.state_dict(), 'model_lyrics.pth')
+print("\n=== 저장 완료: output_lyrics.txt, model_lyrics.pth, loss_log.txt ===")
